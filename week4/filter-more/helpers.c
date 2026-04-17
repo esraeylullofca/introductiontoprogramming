@@ -19,7 +19,7 @@ void grayscale(int height, int width, RGBTRIPLE image[height][width])
     }
 }
 
-// Reflect (horizontal)
+// Reflect
 void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
     for (int i = 0; i < height; i++)
@@ -46,8 +46,6 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
         }
     }
 
-    int di[3] = {-1, 0, 1};
-
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -55,12 +53,12 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
             int red = 0, green = 0, blue = 0;
             int count = 0;
 
-            for (int dii = 0; dii < 3; dii++)
+            for (int di = -1; di <= 1; di++)
             {
-                for (int djj = 0; djj < 3; djj++)
+                for (int dj = -1; dj <= 1; dj++)
                 {
-                    int ni = i + di[dii];
-                    int nj = j + di[djj];
+                    int ni = i + di;
+                    int nj = j + dj;
 
                     if (ni >= 0 && ni < height && nj >= 0 && nj < width)
                     {
@@ -79,7 +77,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
     }
 }
 
-// Edges (Sobel Operator) 🔥
+// Edges (Sobel)
 void edges(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE copy[height][width];
@@ -92,13 +90,15 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
         }
     }
 
-    int Gx[3][3] = {
+    int Gx[3][3] =
+    {
         {-1, 0, 1},
         {-2, 0, 2},
         {-1, 0, 1}
     };
 
-    int Gy[3][3] = {
+    int Gy[3][3] =
+    {
         {-1, -2, -1},
         { 0,  0,  0},
         { 1,  2,  1}
@@ -140,13 +140,9 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
             int g = round(sqrt(sumGx * sumGx + sumGy * sumGy));
             int b = round(sqrt(sumBx * sumBx + sumBy * sumBy));
 
-            if (r > 255) r = 255;
-            if (g > 255) g = 255;
-            if (b > 255) b = 255;
-
-            image[i][j].rgbtRed = r;
-            image[i][j].rgbtGreen = g;
-            image[i][j].rgbtBlue = b;
+            image[i][j].rgbtRed = (r > 255) ? 255 : r;
+            image[i][j].rgbtGreen = (g > 255) ? 255 : g;
+            image[i][j].rgbtBlue = (b > 255) ? 255 : b;
         }
     }
 }
