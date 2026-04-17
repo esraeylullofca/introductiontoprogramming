@@ -112,4 +112,6 @@ int main(int argc, char *argv[])
     free(image);
     fclose(inptr);
     fclose(outptr);
+
+    return 0;
 }
