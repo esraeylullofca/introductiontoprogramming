@@ -75,3 +75,29 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
         }
     }
 }
+
+// SEPIA
+void sepia(int height, int width, RGBTRIPLE image[height][width])
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int r = image[i][j].rgbtRed;
+            int g = image[i][j].rgbtGreen;
+            int b = image[i][j].rgbtBlue;
+
+            int sr = round(.393 * r + .769 * g + .189 * b);
+            int sg = round(.349 * r + .686 * g + .168 * b);
+            int sb = round(.272 * r + .534 * g + .131 * b);
+
+            if (sr > 255) sr = 255;
+            if (sg > 255) sg = 255;
+            if (sb > 255) sb = 255;
+
+            image[i][j].rgbtRed = sr;
+            image[i][j].rgbtGreen = sg;
+            image[i][j].rgbtBlue = sb;
+        }
+    }
+}
