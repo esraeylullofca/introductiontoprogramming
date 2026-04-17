@@ -1,4 +1,4 @@
-#include <helpers.h>
+#include <stdint.h>
 #include <math.h>
 
 // GRAYSCALE
