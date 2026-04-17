@@ -1,25 +1,25 @@
 #include "helpers.h"
 #include <math.h>
 
-// Convert image to grayscale
+// grayscale
 void grayscale(int height, int width, RGBTRIPLE image[height][width])
 {
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            int avg = round((image[i][j].rgbtBlue +
+            int avg = round((image[i][j].rgbtRed +
                              image[i][j].rgbtGreen +
-                             image[i][j].rgbtRed) / 3.0);
+                             image[i][j].rgbtBlue) / 3.0);
 
-            image[i][j].rgbtBlue = avg;
-            image[i][j].rgbtGreen = avg;
             image[i][j].rgbtRed = avg;
+            image[i][j].rgbtGreen = avg;
+            image[i][j].rgbtBlue = avg;
         }
     }
 }
 
-// Reflect image horizontally
+// reflect
 void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
     for (int i = 0; i < height; i++)
@@ -33,12 +33,11 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
     }
 }
 
-// Blur image
+// blur
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE copy[height][width];
 
-    // copy original
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -51,8 +50,7 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
     {
         for (int j = 0; j < width; j++)
         {
-            int sumRed = 0, sumGreen = 0, sumBlue = 0;
-            int count = 0;
+            int sumR = 0, sumG = 0, sumB = 0, count = 0;
 
             for (int di = -1; di <= 1; di++)
             {
@@ -63,27 +61,26 @@ void blur(int height, int width, RGBTRIPLE image[height][width])
 
                     if (ni >= 0 && ni < height && nj >= 0 && nj < width)
                     {
-                        sumRed += copy[ni][nj].rgbtRed;
-                        sumGreen += copy[ni][nj].rgbtGreen;
-                        sumBlue += copy[ni][nj].rgbtBlue;
+                        sumR += copy[ni][nj].rgbtRed;
+                        sumG += copy[ni][nj].rgbtGreen;
+                        sumB += copy[ni][nj].rgbtBlue;
                         count++;
                     }
                 }
             }
 
-            image[i][j].rgbtRed = round((float) sumRed / count);
-            image[i][j].rgbtGreen = round((float) sumGreen / count);
-            image[i][j].rgbtBlue = round((float) sumBlue / count);
+            image[i][j].rgbtRed = round((float) sumR / count);
+            image[i][j].rgbtGreen = round((float) sumG / count);
+            image[i][j].rgbtBlue = round((float) sumB / count);
         }
     }
 }
 
-// Detect edges (Sobel)
+// edges
 void edges(int height, int width, RGBTRIPLE image[height][width])
 {
     RGBTRIPLE copy[height][width];
 
-    // copy original
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -100,16 +97,17 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
 
     int Gy[3][3] = {
         {-1, -2, -1},
-        { 0,  0,  0},
-        { 1,  2,  1}
+        {0, 0, 0},
+        {1, 2, 1}
     };
 
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            int sumRx = 0, sumGx = 0, sumBx = 0;
-            int sumRy = 0, sumGy = 0, sumBy = 0;
+            int Rx = 0, Ry = 0;
+            int GxSum = 0, GySum = 0;
+            int Bx = 0, By = 0;
 
             for (int di = -1; di <= 1; di++)
             {
@@ -123,22 +121,22 @@ void edges(int height, int width, RGBTRIPLE image[height][width])
                         int kx = Gx[di + 1][dj + 1];
                         int ky = Gy[di + 1][dj + 1];
 
-                        sumRx += copy[ni][nj].rgbtRed * kx;
-                        sumGx += copy[ni][nj].rgbtGreen * kx;
-                        sumBx += copy[ni][nj].rgbtBlue * kx;
+                        Rx += copy[ni][nj].rgbtRed * kx;
+                        Ry += copy[ni][nj].rgbtRed * ky;
 
-                        sumRy += copy[ni][nj].rgbtRed * ky;
-                        sumGy += copy[ni][nj].rgbtGreen * ky;
-                        sumBy += copy[ni][nj].rgbtBlue * ky;
+                        GxSum += copy[ni][nj].rgbtGreen * kx;
+                        GySum += copy[ni][nj].rgbtGreen * ky;
+
+                        Bx += copy[ni][nj].rgbtBlue * kx;
+                        By += copy[ni][nj].rgbtBlue * ky;
                     }
                 }
             }
 
-            int red = round(sqrt(sumRx * sumRx + sumRy * sumRy));
-            int green = round(sqrt(sumGx * sumGx + sumGy * sumGy));
-            int blue = round(sqrt(sumBx * sumBx + sumBy * sumBy));
+            int red = round(sqrt(Rx * Rx + Ry * Ry));
+            int green = round(sqrt(GxSum * GxSum + GySum * GySum));
+            int blue = round(sqrt(Bx * Bx + By * By));
 
-            // cap at 255
             if (red > 255) red = 255;
             if (green > 255) green = 255;
             if (blue > 255) blue = 255;
