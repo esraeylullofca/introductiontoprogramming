@@ -7,10 +7,10 @@
 
 int main(int argc, char *argv[])
 {
-    // Define allowed filters
-    char *filters = "bgrs";
+    // Acceptable filters
+    char *filters = "bgr";
 
-    // Get filter flag and check validity
+    // Get filter flag
     char filter = getopt(argc, argv, filters);
     if (filter == '?')
     {
@@ -32,11 +32,10 @@ int main(int argc, char *argv[])
         return 3;
     }
 
-    // Remember filenames
+    // Input and output files
     char *infile = argv[optind];
     char *outfile = argv[optind + 1];
 
-    // Open input file
     FILE *inptr = fopen(infile, "rb");
     if (inptr == NULL)
     {
@@ -44,7 +43,6 @@ int main(int argc, char *argv[])
         return 4;
     }
 
-    // Open output file
     FILE *outptr = fopen(outfile, "wb");
     if (outptr == NULL)
     {
@@ -53,17 +51,16 @@ int main(int argc, char *argv[])
         return 5;
     }
 
-    // Read infile's BITMAPFILEHEADER
+    // Read headers
     BITMAPFILEHEADER bf;
     fread(&bf, sizeof(BITMAPFILEHEADER), 1, inptr);
 
-    // Read infile's BITMAPINFOHEADER
     BITMAPINFOHEADER bi;
     fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
 
-    // Ensure infile is (likely) a 24-bit uncompressed BMP 4.0
-    if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 || bi.biSize != 40 ||
-        bi.biBitCount != 24 || bi.biCompression != 0)
+    // Validate BMP format
+    if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 ||
+        bi.biSize != 40 || bi.biBitCount != 24 || bi.biCompression != 0)
     {
         fclose(outptr);
         fclose(inptr);
@@ -71,66 +68,61 @@ int main(int argc, char *argv[])
         return 6;
     }
 
-    // Get image dimensions
     int height = abs(bi.biHeight);
     int width = bi.biWidth;
 
-    // Allocate memory for image
-    RGBTRIPLE(*image)[width] = calloc(height, width * sizeof(RGBTRIPLE));
+    // Allocate memory
+    RGBTRIPLE (*image)[width] = calloc(height, width * sizeof(RGBTRIPLE));
     if (image == NULL)
     {
-        fprintf(stderr, "Not enough memory to store image.\n");
+        fprintf(stderr, "Not enough memory.\n");
         fclose(outptr);
         fclose(inptr);
         return 7;
     }
 
-    // Determine padding for scanlines
     int padding = (4 - (width * sizeof(RGBTRIPLE)) % 4) % 4;
 
-    // Iterate over infile's scanlines
+    // Read pixels
     for (int i = 0; i < height; i++)
     {
         fread(image[i], sizeof(RGBTRIPLE), width, inptr);
         fseek(inptr, padding, SEEK_CUR);
     }
 
-    // Filter image
+    // APPLY FILTER
     switch (filter)
     {
         case 'b':
             blur(height, width, image);
             break;
+
         case 'g':
             grayscale(height, width, image);
             break;
+
         case 'r':
             reflect(height, width, image);
             break;
-        case 's':
-            sepia(height, width, image);
-            break;
     }
 
-    // Write outfile's BITMAPFILEHEADER
+    // Write output file
     fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
-
-    // Write outfile's BITMAPINFOHEADER
     fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
 
-    // Write new pixels to outfile
     for (int i = 0; i < height; i++)
     {
         fwrite(image[i], sizeof(RGBTRIPLE), width, outptr);
-        for (int k = 0; k < padding; k++)
+
+        for (int j = 0; j < padding; j++)
         {
             fputc(0x00, outptr);
         }
     }
 
-    // Free memory
     free(image);
     fclose(inptr);
     fclose(outptr);
+
     return 0;
 }
