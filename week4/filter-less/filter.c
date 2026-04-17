@@ -1,8 +1,3 @@
-// CS50x Week 4 — Filter (Less): filter.c
-// ⚠️  DO NOT MODIFY THIS FILE
-// Distribution code provided by CS50.
-// This file handles argument parsing, BMP reading/writing, and calls your helpers.
-
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
