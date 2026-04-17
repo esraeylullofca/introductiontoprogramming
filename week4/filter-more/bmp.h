@@ -1,3 +1,5 @@
+#ifndef BMP_H
+#define BMP_H
 #include <stdint.h>
 
 typedef uint8_t  BYTE;
@@ -38,3 +40,4 @@ typedef struct
     BYTE  rgbtRed;
 } __attribute__((__packed__))
 RGBTRIPLE;
+#endif // BMP_H
