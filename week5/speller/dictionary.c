@@ -7,9 +7,9 @@
 
 #include "dictionary.h"
 
-#define N 10007   // daha hızlı (collision düşük)
+// Number of buckets (prime number for fewer collisions)
+#define N 10007
 
-// Node structure
 typedef struct node
 {
     char word[LENGTH + 1];
@@ -19,12 +19,10 @@ typedef struct node
 // Hash table
 node *table[N];
 
-// Global word counter
+// Word counter
 unsigned int word_count = 0;
 
-// ---------------------------------------------------------------------------
-// HASH FUNCTION (djb2 - fast + good distribution)
-// ---------------------------------------------------------------------------
+// Hash function (djb2)
 unsigned int hash(const char *word)
 {
     unsigned long hash_val = 5381;
@@ -37,9 +35,7 @@ unsigned int hash(const char *word)
     return hash_val % N;
 }
 
-// ---------------------------------------------------------------------------
-// LOAD DICTIONARY
-// ---------------------------------------------------------------------------
+// Load dictionary into memory
 bool load(const char *dictionary)
 {
     FILE *file = fopen(dictionary, "r");
@@ -73,9 +69,7 @@ bool load(const char *dictionary)
     return true;
 }
 
-// ---------------------------------------------------------------------------
-// CHECK WORD
-// ---------------------------------------------------------------------------
+// Check if word exists in dictionary
 bool check(const char *word)
 {
     unsigned int index = hash(word);
@@ -94,17 +88,13 @@ bool check(const char *word)
     return false;
 }
 
-// ---------------------------------------------------------------------------
-// SIZE
-// ---------------------------------------------------------------------------
+// Return number of words loaded
 unsigned int size(void)
 {
     return word_count;
 }
 
-// ---------------------------------------------------------------------------
-// UNLOAD
-// ---------------------------------------------------------------------------
+// Free all memory
 bool unload(void)
 {
     for (int i = 0; i < N; i++)
