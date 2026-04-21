@@ -1,9 +1,11 @@
 # favorites6_solution.py
+
 import csv
 
 with open("../week1/favorites.csv", "r") as file:
     reader = csv.DictReader(file)
     counts = {}
+
     for row in reader:
         favorite = row["language"]
         try:
