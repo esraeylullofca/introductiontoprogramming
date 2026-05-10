@@ -27,13 +27,25 @@ def cart():
     if "cart" not in session:
         session["cart"] = []
 
-    # POST
+    # POST → add item
     if request.method == "POST":
         book_id = request.form.get("id")
+
         if book_id:
-            session["cart"].append(book_id)
+            cart = session["cart"]
+            cart.append(book_id)
+            session["cart"] = cart   # 🔥 önemli fix
+
         return redirect("/cart")
 
-    # GET
-    books = db.execute("SELECT * FROM books WHERE id IN (?)", session["cart"])
+    # GET → show cart
+    cart = session.get("cart", [])
+
+    if not cart:
+        books = []
+    else:
+        books = db.execute(
+            "SELECT * FROM books WHERE id IN (?)", cart
+        )
+
     return render_template("cart.html", books=books)
