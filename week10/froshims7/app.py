@@ -1,36 +1,66 @@
-# Implements a registration form, storing registrants in a SQLite database, with support for multiple sports and deregistration
+# Multiple sports + deregistration (SQLite)
 
-# TODO: Import SQL from cs50
-# TODO: Import Flask, redirect, render_template, and request from flask
+from cs50 import SQL
+from flask import Flask, redirect, render_template, request
 
+app = Flask(__name__)
 
-# TODO: Create the Flask app instance
+# Database
+db = SQL("sqlite:///froshims.db")
 
-
-# TODO: Connect to "froshims.db" with cs50's SQL() and store in db
-
-
-# TODO: Define the SPORTS list with at least 3 sport names
-
-
-# TODO: Define a GET route for "/" that renders index.html with sports=SPORTS
-
-
-# TODO: Define a POST route for "/deregister" that:
-#         - Reads "id" from the form
-#         - If id exists, deletes the row: DELETE FROM registrants WHERE id = ?
-#         - Redirects to "/registrants"
+# Allowed sports
+SPORTS = [
+    "Basketball",
+    "Soccer",
+    "Ultimate Frisbee"
+]
 
 
-# TODO: Define a POST route for "/register" that:
-#         1. Validates name (missing → error.html message="Missing name")
-#         2. Uses request.form.getlist("sport") to get all selected sports
-#         3. If the list is empty → error.html message="Missing sport"
-#         4. If any sport is not in SPORTS → error.html message="Invalid sport"
-#         5. Inserts one row per sport into the database
-#         6. Redirects to "/registrants"
+@app.route("/")
+def index():
+    return render_template("index.html", sports=SPORTS)
 
 
-# TODO: Define a GET route for "/registrants" that:
-#         - Queries all registrants from the database
-#         - Renders registrants.html passing the results as "registrants"
+@app.route("/register", methods=["POST"])
+def register():
+
+    name = request.form.get("name")
+    if not name:
+        return render_template("error.html", message="Missing name")
+
+    sports = request.form.getlist("sport")
+
+    if not sports:
+        return render_template("error.html", message="Missing sport")
+
+    for sport in sports:
+        if sport not in SPORTS:
+            return render_template("error.html", message="Invalid sport")
+
+    # Insert one row per sport
+    for sport in sports:
+        db.execute(
+            "INSERT INTO registrants (name, sport) VALUES(?, ?)",
+            name, sport
+        )
+
+    return redirect("/registrants")
+
+
+@app.route("/registrants")
+def registrants():
+
+    registrants = db.execute("SELECT * FROM registrants")
+
+    return render_template("registrants.html", registrants=registrants)
+
+
+@app.route("/deregister", methods=["POST"])
+def deregister():
+
+    id = request.form.get("id")
+
+    if id:
+        db.execute("DELETE FROM registrants WHERE id = ?", id)
+
+    return redirect("/registrants")

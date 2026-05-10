@@ -2,6 +2,7 @@
 
 {% block body %}
     <h1>Registrants</h1>
+
     <table>
         <thead>
             <tr>
@@ -10,6 +11,7 @@
                 <th></th>
             </tr>
         </thead>
+
         <tbody>
             {% for registrant in registrants %}
                 <tr>
@@ -17,7 +19,7 @@
                     <td>{{ registrant["sport"] }}</td>
                     <td>
                         <form action="/deregister" method="post">
-                            <input name="id" type="hidden" value="{{ registrant.id }}">
+                            <input name="id" type="hidden" value="{{ registrant["id"] }}">
                             <button type="submit">Deregister</button>
                         </form>
                     </td>
@@ -25,4 +27,5 @@
             {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}
