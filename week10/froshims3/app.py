@@ -1,19 +1,40 @@
 # Adds error messages
 
-# TODO: Import Flask, render_template, and request from flask
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+# Allowed sports
+SPORTS = [
+    "Basketball",
+    "Soccer",
+    "Ultimate Frisbee"
+]
 
 
-# TODO: Create the Flask app instance
+# Homepage
+@app.route("/")
+def index():
+    return render_template("index.html", sports=SPORTS)
 
 
-# TODO: Define the SPORTS list with at least 3 sport names
+# Registration
+@app.route("/register", methods=["POST"])
+def register():
 
+    # Validate name
+    name = request.form.get("name")
+    if not name:
+        return render_template("error.html", message="Missing name")
 
-# TODO: Define a GET route for "/" that renders index.html with sports=SPORTS
+    # Validate sport
+    sport = request.form.get("sport")
+    if not sport:
+        return render_template("error.html", message="Missing sport")
 
+    # Validate allowed sports
+    if sport not in SPORTS:
+        return render_template("error.html", message="Invalid sport")
 
-# TODO: Define a POST route for "/register" that validates step by step:
-#         1. Get "name" — if missing, render error.html with message="Missing name"
-#         2. Get "sport" — if missing, render error.html with message="Missing sport"
-#         3. If sport is not in SPORTS, render error.html with message="Invalid sport"
-#         4. If all valid, render success.html
+    # Success
+    return render_template("success.html")

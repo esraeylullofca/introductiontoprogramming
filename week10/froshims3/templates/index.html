@@ -3,13 +3,25 @@
 {% block body %}
     <h1>Register</h1>
 
-    <!-- TODO: Create a form that POSTs to /register -->
+    <form action="/register" method="post">
 
-        <!-- TODO: Add a text input for name -->
+        <!-- Name input -->
+        <input type="text" name="name" placeholder="Name">
 
-        <!-- TODO: Use a Jinja2 for loop to render one radio button per sport.
-                   All radios should share name="sport" and use the sport as the value -->
+        <br><br>
 
-        <!-- TODO: Add a submit button -->
+        <!-- Radio buttons -->
+        {% for sport in sports %}
+            <input name="sport" type="radio" value="{{ sport }}">
+            {{ sport }}
+            <br>
+        {% endfor %}
+
+        <br>
+
+        <!-- Submit button -->
+        <button type="submit">Register</button>
+
+    </form>
 
 {% endblock %}

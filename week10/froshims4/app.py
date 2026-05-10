@@ -4,8 +4,10 @@ from flask import Flask, redirect, render_template, request
 
 app = Flask(__name__)
 
+# Dictionary to store registrants
 REGISTRANTS = {}
 
+# Allowed sports
 SPORTS = [
     "Basketball",
     "Soccer",
@@ -13,11 +15,13 @@ SPORTS = [
 ]
 
 
+# Homepage
 @app.route("/")
 def index():
     return render_template("index.html", sports=SPORTS)
 
 
+# Register route
 @app.route("/register", methods=["POST"])
 def register():
 
@@ -28,18 +32,21 @@ def register():
 
     # Validate sport
     sport = request.form.get("sport")
+
     if not sport:
         return render_template("error.html", message="Missing sport")
+
     if sport not in SPORTS:
         return render_template("error.html", message="Invalid sport")
 
-    # Remember registrant
+    # Store registrant
     REGISTRANTS[name] = sport
 
-    # Confirm registration
+    # Redirect to registrants page
     return redirect("/registrants")
 
 
+# Show all registrants
 @app.route("/registrants")
 def registrants():
     return render_template("registrants.html", registrants=REGISTRANTS)

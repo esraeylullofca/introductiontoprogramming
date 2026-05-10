@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <!-- TODO: Add an <h1> heading that says "Error" -->
 
-    <!-- TODO: Display the dynamic error message using {{ message }} inside a <p> tag -->
+    <h1>Error</h1>
 
-    <!-- TODO: Show an image from the /static/ folder -->
+    <p>{{ message }}</p>
+
+    <img alt="Grumpy Cat" src="/static/cat.jpg">
+
 {% endblock %}
